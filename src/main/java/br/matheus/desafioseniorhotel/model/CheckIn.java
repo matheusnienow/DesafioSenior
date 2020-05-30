@@ -15,7 +15,10 @@ import javax.validation.constraints.NotBlank;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.matheus.desafioseniorhotel.config.HotelAppConfig;
 
 @Entity
 @Table(name="checkin")
@@ -35,9 +38,11 @@ public class CheckIn extends AuditModel {
     @JsonIgnore
     private Hospede hospede;
 	
+	@JsonFormat(pattern = HotelAppConfig.DATETIME_FORMAT)
 	@NotBlank
 	private LocalDateTime dataEntrada;
 	
+	@JsonFormat(pattern = HotelAppConfig.DATETIME_FORMAT)	
 	private LocalDateTime dataSaida;
 	
 	private boolean adicionalVeiculo;
