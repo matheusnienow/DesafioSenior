@@ -59,7 +59,6 @@ public class CheckInController {
 		return checkInRepository.findById(checkInId).map(checkIn -> {
 			checkIn.setDataEntrada(checkInRequest.getDataEntrada());
 			checkIn.setDataSaida(checkInRequest.getDataSaida());
-			checkIn.setHospede(checkInRequest.getHospede());
 			checkIn.setAdicionalVeiculo(checkInRequest.isAdicionalVeiculo());
 			return checkInRepository.save(checkIn);
 		}).orElseThrow(() -> new ResourceNotFoundException("CheckIn com o id " + checkInId + " não encontrado."));
