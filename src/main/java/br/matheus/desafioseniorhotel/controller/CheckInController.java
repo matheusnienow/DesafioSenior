@@ -1,5 +1,6 @@
 package br.matheus.desafioseniorhotel.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ import br.matheus.desafioseniorhotel.exception.ResourceNotFoundException;
 import br.matheus.desafioseniorhotel.model.CheckIn;
 import br.matheus.desafioseniorhotel.repository.CheckInRepository;
 import br.matheus.desafioseniorhotel.repository.HospedeRepository;
+import br.matheus.desafioseniorhotel.service.CheckInService;
 
 @RestController
 public class CheckInController {
@@ -44,9 +46,29 @@ public class CheckInController {
 	public CheckIn addCheckIn(@PathVariable Long hospedeId, @Valid @RequestBody CheckIn checkIn)
 			throws ResourceNotFoundException {
 		return hospedeRepository.findById(hospedeId).map(hospede -> {
+			
+			if (checkIn.getDataEntrada() == null) {
+				checkIn.setDataEntrada(LocalDateTime.now());
+			}			
 			checkIn.setHospede(hospede);
+			
 			return checkInRepository.save(checkIn);
 		}).orElseThrow(() -> new ResourceNotFoundException("Hospede com o id " + hospedeId + " não encontrado."));
+	}
+
+	@PutMapping("/hospedes/{hospedeId}/checkout")
+	public CheckIn updateCheckIn(@PathVariable Long hospedeId) throws ResourceNotFoundException {
+		if (!hospedeRepository.existsById(hospedeId)) {
+			throw new ResourceNotFoundException("Hospede com o id " + hospedeId + " não encontrado.");
+		}
+
+		var checkIn = checkInRepository.findByHospedeIdAndDataSaidaNull(hospedeId);
+		checkIn.setDataSaida(LocalDateTime.now());
+		
+		Double valor = CheckInService.calcularValorCheckOut(checkIn.getDataEntrada(), checkIn.getDataSaida(), checkIn.isAdicionalVeiculo());
+		checkIn.setValor(valor);
+		
+		return checkInRepository.save(checkIn);
 	}
 
 	@PutMapping("/hospedes/{hospedeId}/checkins/{checkInId}")

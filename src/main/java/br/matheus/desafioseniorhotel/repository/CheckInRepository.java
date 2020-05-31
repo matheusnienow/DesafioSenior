@@ -7,4 +7,7 @@ import br.matheus.desafioseniorhotel.model.CheckIn;
 
 public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
 	List<CheckIn> findByHospedeId(Long hospedeId);
+	List<CheckIn> findByDataSaidaNull();
+	List<CheckIn> findByDataSaidaNotNull();
+	CheckIn findByHospedeIdAndDataSaidaNull(Long hospedeId);
 }

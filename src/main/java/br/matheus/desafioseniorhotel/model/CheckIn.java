@@ -32,7 +32,7 @@ public class CheckIn extends AuditModel {
     )
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "hospede_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
@@ -46,6 +46,8 @@ public class CheckIn extends AuditModel {
 	private LocalDateTime dataSaida;
 	
 	private boolean adicionalVeiculo;
+	
+	private Double valor;
 
 	public Long getId() {
 		return id;
@@ -85,5 +87,13 @@ public class CheckIn extends AuditModel {
 
 	public void setAdicionalVeiculo(boolean adicionalVeiculo) {
 		this.adicionalVeiculo = adicionalVeiculo;
+	}
+
+	public Double getValor() {
+		return valor;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
 	}
 }

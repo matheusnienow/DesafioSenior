@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 public class HotelAppConfig {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+	public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	//Deixei esse código abaixo comentado apenas para demonstrar que tentei definir uma formatação global de data para a aplicação
 	//porém parece que não é possível fazer isso no momento para os tipo LocalDate e LocalDatetime
