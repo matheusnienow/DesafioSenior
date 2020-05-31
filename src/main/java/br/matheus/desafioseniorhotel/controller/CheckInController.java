@@ -2,35 +2,29 @@ package br.matheus.desafioseniorhotel.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.matheus.desafioseniorhotel.exception.ResourceNotFoundException;
 import br.matheus.desafioseniorhotel.model.CheckIn;
+import br.matheus.desafioseniorhotel.model.Hospede;
 import br.matheus.desafioseniorhotel.repository.CheckInRepository;
 import br.matheus.desafioseniorhotel.repository.HospedeRepository;
 import br.matheus.desafioseniorhotel.service.CheckInService;
 
 @RestController
 public class CheckInController {
-
-	private final Log logger = LogFactory.getLog(getClass());
-
 	@Autowired
 	private CheckInRepository checkInRepository;
 
@@ -39,25 +33,31 @@ public class CheckInController {
 
 	@GetMapping("/hospedes/{hospedeId}/checkins")
 	public List<CheckIn> getCheckInsByHospedeId(@PathVariable Long hospedeId) {
-		return checkInRepository.findByHospedeId(hospedeId);
+		List<CheckIn> checkins = checkInRepository.findByHospedeId(hospedeId);
+		return checkins;
 	}
 
 	@PostMapping("/hospedes/{hospedeId}/checkins")
 	public CheckIn addCheckIn(@PathVariable Long hospedeId, @Valid @RequestBody CheckIn checkIn)
-			throws ResourceNotFoundException {
-		return hospedeRepository.findById(hospedeId).map(hospede -> {
-			
+			throws ResourceNotFoundException {		
+		Optional<Hospede> hospede = hospedeRepository.findById(hospedeId);
+		
+		@Valid
+		CheckIn checkin = hospede.map(h -> {			
 			if (checkIn.getDataEntrada() == null) {
 				checkIn.setDataEntrada(LocalDateTime.now());
 			}			
-			checkIn.setHospede(hospede);
+			checkIn.setHospede(h);
 			
 			return checkInRepository.save(checkIn);
 		}).orElseThrow(() -> new ResourceNotFoundException("Hospede com o id " + hospedeId + " não encontrado."));
+		
+		return checkin;
 	}
 
 	@PutMapping("/hospedes/{hospedeId}/checkout")
 	public CheckIn updateCheckIn(@PathVariable Long hospedeId) throws ResourceNotFoundException {
+		
 		if (!hospedeRepository.existsById(hospedeId)) {
 			throw new ResourceNotFoundException("Hospede com o id " + hospedeId + " não encontrado.");
 		}
@@ -98,11 +98,5 @@ public class CheckInController {
 			return ResponseEntity.ok().build();
 		}).orElseThrow(() -> new ResourceNotFoundException("CheckIn com o id " + checkInId + " não encontrado."));
 
-	}
-
-	@ExceptionHandler
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public void handle(Exception e) {
-		logger.warn("Returning HTTP 400 Bad Request", e);
 	}
 }

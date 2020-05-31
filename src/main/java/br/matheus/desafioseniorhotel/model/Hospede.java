@@ -72,7 +72,6 @@ public class Hospede extends AuditModel {
 		if (checkIns == null || checkIns.isEmpty()) {
 			return;
 		}
-
 		loadTotalGasto();
 		loadUltimoGasto();
 	}
